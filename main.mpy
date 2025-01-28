@@ -1,0 +1,48 @@
+from dataclasses import dataclass
+import array
+import math 
+
+
+#the configuration, block_size is context length, and vocab_size is well vocabsize, might need to decrease embeded/head/layers we'll see
+@dataclass
+class GPTConfig:
+    block_size: int  = 3
+    vocab_size: int = 2 
+    n_layer: int = 4 
+    n_head: int = 4 
+    n_embed: int = 16
+    bias: bool = False
+
+class CausalSelfAttention:
+    def __init__(self, config):
+        self.n_head = config.n_head
+        self.n_embed = config.n_head
+        scale = 1024
+        
+        # Quantized weights stored in int16 arrays
+        self.query = array.array('h', [0] * (config.n_embd * config.n_embd))
+        self.key = array.array('h', [0] * (config.n_embd * config.n_embd))
+        self.value = array.array('h', [0] * (config.n_embd * config.n_embd))
+        self.proj = array.array('h', [0] * (config.n_embd * config.n_embd))
+        
+        # Causal mask
+        self.mask = array.array('h', [0 if i > j else scale 
+                               for i in range(config.block_size) 
+                               for j in range(config.block_size)])
+
+    def forward(self, x):
+        B, T, C = len(x), len(x[0]), len(x[0][0]) #batch size, sequence length, embedding dimensionality 
+
+        q = self._quantized_matmul(x, self.query)
+        k = self._quantized_matmul(x, self.key)
+        v = self._quantized_matmul(x, self.value)
+
+
+
+
+
+
+
+
+class MicroTransformer: 
+    def __init__(self, config)
