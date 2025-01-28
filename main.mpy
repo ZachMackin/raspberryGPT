@@ -44,8 +44,21 @@ class CausalSelfAttention:
         
         # Apply attention to values
         out = self._quantized_matmul(att, v)
-        
+
         return self._quantized_matmul(out, self.proj)
+    
+      def _quantized_matmul(self, a, b):
+        # Fixed-point matrix multiplication
+        result = []
+        for i in range(len(a)):
+            row = []
+            for j in range(len(b[0])):
+                val = 0
+                for k in range(len(b)):
+                    val += (a[i][k] * b[k][j]) >> 10  # Scale down
+                row.append(val)
+            result.append(row)
+        return result
 
 
 
