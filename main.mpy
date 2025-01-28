@@ -37,6 +37,15 @@ class CausalSelfAttention:
         k = self._quantized_matmul(x, self.key)
         v = self._quantized_matmul(x, self.value)
 
+        scale = int(1024 / math.sqrt(C))
+        att = self._quantized_matmul(q, self._transpose(k))
+
+        att = self._apply_mask(att, T)
+        
+        # Apply attention to values
+        out = self._quantized_matmul(att, v)
+        
+        return self._quantized_matmul(out, self.proj)
 
 
 
